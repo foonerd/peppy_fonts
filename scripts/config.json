@@ -1,0 +1,59 @@
+{
+    "output_dir": "fonts",
+    "output_prefix": "PeppyFont",
+    "weights": {
+        "Light": {
+            "base": "NotoSans-Light.ttf",
+            "cjk": "NotoSansCJKsc-Light.otf",
+            "scripts": [
+                "NotoSansArabic-Light.ttf",
+                "NotoSansHebrew-Light.ttf",
+                "NotoSansDevanagari-Light.ttf",
+                "NotoSansBengali-Light.ttf",
+                "NotoSansTamil-Light.ttf",
+                "NotoSansThai-Light.ttf",
+                "NotoSansGeorgian-Light.ttf",
+                "NotoSansArmenian-Light.ttf"
+            ]
+        },
+        "Regular": {
+            "base": "NotoSans-Regular.ttf",
+            "cjk": "NotoSansCJKsc-Regular.otf",
+            "scripts": [
+                "NotoSansArabic-Regular.ttf",
+                "NotoSansHebrew-Regular.ttf",
+                "NotoSansDevanagari-Regular.ttf",
+                "NotoSansBengali-Regular.ttf",
+                "NotoSansTamil-Regular.ttf",
+                "NotoSansThai-Regular.ttf",
+                "NotoSansGeorgian-Regular.ttf",
+                "NotoSansArmenian-Regular.ttf"
+            ]
+        },
+        "Bold": {
+            "base": "NotoSans-Bold.ttf",
+            "cjk": "NotoSansCJKsc-Bold.otf",
+            "scripts": [
+                "NotoSansArabic-Bold.ttf",
+                "NotoSansHebrew-Bold.ttf",
+                "NotoSansDevanagari-Bold.ttf",
+                "NotoSansBengali-Bold.ttf",
+                "NotoSansTamil-Bold.ttf",
+                "NotoSansThai-Bold.ttf",
+                "NotoSansGeorgian-Bold.ttf",
+                "NotoSansArmenian-Bold.ttf"
+            ]
+        }
+    },
+    "sources": {
+        "noto_base": "https://github.com/notofonts/notofonts.github.io/raw/main/fonts",
+        "noto_cjk": "https://github.com/notofonts/noto-cjk/raw/main/Sans/OTF/SimplifiedChinese"
+    },
+    "_comment": [
+        "NotoSans base includes Latin, Cyrillic, Greek.",
+        "NotoSansCJKsc includes CJK unified ideographs, Hangul, Kana.",
+        "Per-script fonts add Arabic, Hebrew, Indic, Thai, etc.",
+        "65535 glyph limit per TTF - CJK may need IICore subsetting.",
+        "If full CJK exceeds limit, build.py will subset automatically."
+    ]
+}

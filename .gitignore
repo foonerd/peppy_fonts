@@ -1,0 +1,10 @@
+# Downloaded source fonts (cached, not committed)
+.cache/
+
+# Python
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store
+Thumbs.db
