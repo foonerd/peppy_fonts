@@ -17,6 +17,7 @@ import struct
 import sys
 import time
 import urllib.request
+import urllib.error
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 REPO_DIR = os.path.dirname(SCRIPT_DIR)
@@ -42,8 +43,8 @@ CJK_UNICODE_RANGES = (
     + list(range(0x4E00, 0x9FFF))
     # CJK Compatibility Ideographs
     + list(range(0xF900, 0xFB00))
-    # Hangul Syllables (8192 most common - AC00 to CBFF)
-    + list(range(0xAC00, 0xCC00))
+    # Hangul Syllables (full block - 11172 syllables, AC00 to D7A3)
+    + list(range(0xAC00, 0xD7A4))
     # Fullwidth Forms (fullwidth ASCII, halfwidth katakana)
     + list(range(0xFF00, 0xFFF0))
     # Basic Latin (overlap with base font - needed for subsetter)
@@ -71,21 +72,35 @@ def download_font(filename, source_url, dest_dir):
 
     url = f"{source_url}/{filename}"
     print(f"  Downloading {filename}...")
-    try:
-        req = urllib.request.Request(url, headers={"User-Agent": "PeppyFont-Builder/1.0"})
-        with urllib.request.urlopen(req, timeout=30) as response:
-            data = response.read()
-            if len(data) < 100:
-                print(f"    ERROR: Response too small ({len(data)} bytes) - likely 404")
-                return None
-            os.makedirs(dest_dir, exist_ok=True)
-            with open(dest_path, "wb") as f:
-                f.write(data)
-            print(f"    OK ({len(data) / 1024:.0f}K)")
-            return dest_path
-    except Exception as e:
-        print(f"    FAILED: {e}")
-        return None
+    print(f"    URL: {url}")
+
+    max_retries = 3
+    for attempt in range(1, max_retries + 1):
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": "PeppyFont-Builder/1.0"})
+            with urllib.request.urlopen(req, timeout=30) as response:
+                status = response.getcode()
+                data = response.read()
+                if len(data) < 100:
+                    print(f"    ERROR: Response too small ({len(data)} bytes, HTTP {status})")
+                    return None
+                os.makedirs(dest_dir, exist_ok=True)
+                with open(dest_path, "wb") as f:
+                    f.write(data)
+                print(f"    OK ({len(data) / 1024:.0f}K, HTTP {status})")
+                return dest_path
+        except urllib.error.HTTPError as e:
+            print(f"    HTTP {e.code} (attempt {attempt}/{max_retries})")
+        except Exception as e:
+            print(f"    Error: {e} (attempt {attempt}/{max_retries})")
+
+        if attempt < max_retries:
+            delay = attempt * 2
+            print(f"    Retrying in {delay}s...")
+            time.sleep(delay)
+
+    print(f"    FAILED after {max_retries} attempts")
+    return None
 
 
 def otf_to_ttf(input_path, output_path, max_err=1.0):
@@ -295,16 +310,26 @@ def build_weight(weight_name, weight_config, sources_config, output_dir,
 
         merge_inputs.append(cjk_ttf)
     else:
-        print(f"  WARNING: CJK font {cjk_name} not available - skipping CJK")
+        print(f"  FATAL: CJK font {cjk_name} download failed - cannot build")
+        return None
 
     # --- Per-script fonts (TTF, no conversion needed) ---
+    failed_scripts = []
     for script_name in weight_config.get("scripts", []):
         script_url = resolve_url(script_name, sources_config)
         script_path = download_font(script_name, script_url, base_cache)
         if script_path:
             merge_inputs.append(script_path)
         else:
-            print(f"  WARNING: Script font {script_name} not available - skipping")
+            failed_scripts.append(script_name)
+            print(f"  ERROR: Script font {script_name} download failed")
+
+    if failed_scripts:
+        print(f"\n  FATAL: {len(failed_scripts)} script font(s) failed to download:")
+        for f in failed_scripts:
+            print(f"    - {f}")
+        print("  Cannot build font with missing scripts. Aborting this weight.")
+        return None
 
     # --- Merge ---
     print(f"\n  Merging {len(merge_inputs)} fonts...")
