@@ -226,6 +226,27 @@ def merge_fonts(font_paths, output_path):
 
     merger = Merger()
     merged = merger.merge(font_paths)
+
+    # Normalize vertical metrics to match Lato (Volumio system font).
+    # pyftmerge takes the maximum metrics from all input fonts, which
+    # inflates line height due to CJK (ascent=1374, descent=-738).
+    # The actual glyph outlines fit within Lato's box - only the
+    # declared metrics need correction. Without this, rendered text
+    # is ~78% taller than Lato at the same point size, breaking
+    # existing template layouts.
+    #
+    # Values are Lato metrics normalized from UPM 2000 to UPM 1000:
+    #   Lato UPM 2000: typo asc=1974, desc=-426, win asc=2233, desc=599
+    #   Normalized /2:  typo asc=987,  desc=-213, win asc=1116, desc=299
+    merged['OS/2'].sTypoAscender = 987
+    merged['OS/2'].sTypoDescender = -213
+    merged['OS/2'].sTypoLineGap = 0
+    merged['OS/2'].usWinAscent = 1116
+    merged['OS/2'].usWinDescent = 299
+    merged['hhea'].ascent = 987
+    merged['hhea'].descent = -213
+    merged['hhea'].lineGap = 0
+
     merged.save(output_path)
 
     glyphs = len(merged.getGlyphOrder())
