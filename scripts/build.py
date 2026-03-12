@@ -227,7 +227,7 @@ def merge_fonts(font_paths, output_path):
     merger = Merger()
     merged = merger.merge(font_paths)
 
-    # Normalize vertical metrics to match Lato (Volumio system font).
+    # Normalize vertical metrics to match Lato line height (Volumio system font).
     # pyftmerge takes the maximum metrics from all input fonts, which
     # inflates line height due to CJK (ascent=1374, descent=-738).
     # The actual glyph outlines fit within Lato's box - only the
@@ -235,16 +235,22 @@ def merge_fonts(font_paths, output_path):
     # is ~78% taller than Lato at the same point size, breaking
     # existing template layouts.
     #
-    # Values are Lato metrics normalized from UPM 2000 to UPM 1000:
-    #   Lato UPM 2000: typo asc=1974, desc=-426, win asc=2233, desc=599
-    #   Normalized /2:  typo asc=987,  desc=-213, win asc=1116, desc=299
+    # Ascender matches Lato normalized from UPM 2000 to UPM 1000:
+    #   Lato UPM 2000: typo asc=1974, win asc=2233
+    #   Normalized /2:  typo asc=987,  win asc=1116
+    #
+    # Descender set to -240 (actual Noto glyph yMin for g/j/p/q/y).
+    # Lato's -213 is too shallow - causes 1-2px descender leak in
+    # pygame where font.render() surface exceeds font.get_linesize(),
+    # leaving ghost underline artifacts on scrolling text.
+    # Result: +1px vs Lato at typical sizes (30-35pt), no visual leak.
     merged['OS/2'].sTypoAscender = 987
-    merged['OS/2'].sTypoDescender = -213
+    merged['OS/2'].sTypoDescender = -240
     merged['OS/2'].sTypoLineGap = 0
     merged['OS/2'].usWinAscent = 1116
-    merged['OS/2'].usWinDescent = 299
+    merged['OS/2'].usWinDescent = 290
     merged['hhea'].ascent = 987
-    merged['hhea'].descent = -213
+    merged['hhea'].descent = -240
     merged['hhea'].lineGap = 0
 
     merged.save(output_path)
