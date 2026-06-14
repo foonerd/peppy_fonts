@@ -43,6 +43,20 @@
                 "NotoSansGeorgian-Bold.ttf",
                 "NotoSansArmenian-Bold.ttf"
             ]
+        },
+        "Italic": {
+            "base": "NotoSans-Italic.ttf",
+            "cjk": "NotoSansCJKsc-Regular.otf",
+            "scripts": [
+                "NotoSansArabic-Regular.ttf",
+                "NotoSansHebrew-Regular.ttf",
+                "NotoSansDevanagari-Regular.ttf",
+                "NotoSansBengali-Regular.ttf",
+                "NotoSansTamil-Regular.ttf",
+                "NotoSansThai-Regular.ttf",
+                "NotoSansGeorgian-Regular.ttf",
+                "NotoSansArmenian-Regular.ttf"
+            ]
         }
     },
     "sources": {
@@ -54,6 +68,8 @@
         "NotoSansCJKsc includes CJK unified ideographs, Hangul, Kana.",
         "Per-script fonts add Arabic, Hebrew, Indic, Thai, etc.",
         "65535 glyph limit per TTF - CJK may need IICore subsetting.",
-        "If full CJK exceeds limit, build.py will subset automatically."
+        "If full CJK exceeds limit, build.py will subset automatically.",
+        "Italic weight uses true NotoSans-Italic for Latin/Cyrillic/Greek; CJK and",
+        "per-script faces have no italic in Noto, so they fall back to upright (Regular)."
     ]
 }
