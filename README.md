@@ -8,6 +8,13 @@ with broad Unicode coverage for music metadata display worldwide.
 - `fonts/PeppyFont-Light.ttf` - Light weight (artist, album, smaller text)
 - `fonts/PeppyFont-Regular.ttf` - Regular weight (title, general text)
 - `fonts/PeppyFont-Bold.ttf` - Bold weight (emphasis, headers)
+- `fonts/PeppyFont-Italic.ttf` - Italic (emphasis / styled text)
+
+The Italic face uses the genuine `NotoSans-Italic` for Latin, Cyrillic and
+Greek. CJK and the per-script faces (Arabic, Hebrew, Devanagari, Bengali,
+Tamil, Thai, Georgian, Armenian) ship no italic in Noto, so they fall back to
+their upright (Regular) forms - those scripts do not use italics. The result is
+full script coverage with real italics where they exist.
 
 DSEG7Classic-Italic.ttf (segment display) is not built here. It ships
 separately with peppy_screensaver and peppy_remote.
